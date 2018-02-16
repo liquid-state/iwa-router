@@ -91,7 +91,7 @@ export default class Router {
 
     const location = {
       pathname: message.route,
-      search: stringify(message.params),
+      search: stringify(message.params || {}),
     };
     if (!this.history) {
       throw `Tried to navigate to ${location} but was unable to do so as history is not setup. Make sure you called router.setHistory(history)`;
