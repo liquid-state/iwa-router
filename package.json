@@ -6,6 +6,7 @@
     "dist/"
   ],
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "rollup -c",
     "format": "prettier --parser typescript --single-quote --trailing-comma es5 --print-width 99 --write \"./src/**/*.ts\"",
@@ -30,10 +31,9 @@
     "ts-jest": "^22.0.4",
     "typescript": "^2.7.2"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "peerDependencies": {
-    "@liquid-state/iwa-core": "~0.1.0"
+    "@liquid-state/iwa-core": "^0.1.0"
   },
   "jest": {
     "moduleFileExtensions": [
