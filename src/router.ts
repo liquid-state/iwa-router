@@ -1,4 +1,4 @@
-import { Communicator } from '@liquid-state/iwa-core';
+import { ICommunicator } from '@liquid-state/iwa-core/dist/communicator';
 import { navigate, back, setBackOverride } from './messages';
 import { stringify } from './querystring';
 
@@ -25,7 +25,7 @@ export default class Router {
   public context: object;
   public extraData: object;
 
-  constructor(private communicator: Communicator.ICommunicator) {
+  constructor(private communicator: ICommunicator) {
     communicator.messageReceived.on(message => {
       if (message.purpose === 'navigate') {
         this.handleNavigation(message as NavigateMessage);
