@@ -10,7 +10,8 @@
   "scripts": {
     "build": "rollup -c",
     "format": "prettier --parser typescript --single-quote --trailing-comma es5 --print-width 99 --write \"./src/**/*.ts\"",
-    "test": "jest"
+    "test": "jest",
+    "prepack": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
   },
   "homepage": "https://github.com/liquid-state/iwa-core#readme",
   "devDependencies": {
+    "@liquid-state/iwa-core": "^1",
     "@types/jest": "^22.1.2",
     "jest": "^22.3.0",
     "prettier": "^1.10.2",
@@ -33,7 +35,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "@liquid-state/iwa-core": "^0.1.0"
+    "@liquid-state/iwa-core": "^1"
   },
   "jest": {
     "moduleFileExtensions": [
