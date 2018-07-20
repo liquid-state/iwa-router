@@ -19,7 +19,7 @@ const SET_BACK_OVERRIDE = 'set_back_override';
 
 export const navigate = (
   route: string,
-  app: string | null,
+  app: string | undefined,
   replace = false,
   additionalData?: object
 ) => {

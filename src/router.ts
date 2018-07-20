@@ -44,7 +44,7 @@ export default class Router {
   }
 
   navigate(path: string, replace?: boolean, additionalData?: object) {
-    let iwa: string | null = null;
+    let iwa: string | undefined = undefined;
     if (path.indexOf('external://') !== -1) {
       // Strip the scheme.
       path = path.substr(path.indexOf('//') + 2);
