@@ -1,16 +1,14 @@
 import * as messages from './messages';
 import * as querystring from './querystring';
 import Router from './router';
-import createWrappedHistory from './historyWrapper';
+import createIwaHistory, { IHistory, Location } from './history';
 
-export { messages, querystring, createWrappedHistory, Router };
-
-import createApp from '@liquid-state/iwa-core';
+export { messages, querystring, createIwaHistory, Router };
 
 const initialise = (app: any, historyFactory: any) => {
-  const router = new Router(app.communicator);
-  const history = createWrappedHistory(historyFactory, router);
-  router.setHistory(history);
+  const baseHistory = historyFactory();
+  const router = new Router(app.communicator, baseHistory);
+  const history = createIwaHistory({ baseHistory, router });
   return {
     router,
     history,

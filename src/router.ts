@@ -1,6 +1,6 @@
 import { ICommunicator } from '@liquid-state/iwa-core/dist/communicator';
 import { navigate, back, setBackOverride } from './messages';
-import { stringify } from './querystring';
+import { IHistory } from './history';
 
 interface NavigateMessage {
   purpose: string;
@@ -17,15 +17,12 @@ export interface BackOptions {
 
 export default class Router {
   private backCallback: (() => void) | undefined = undefined;
-  private history: any | undefined = undefined;
   private registeredApps = new Map<string, string>();
-
-  public triggeredRouting = false;
 
   public context: object;
   public extraData: object;
 
-  constructor(private communicator: ICommunicator) {
+  constructor(private communicator: ICommunicator, private history: IHistory) {
     communicator.messageReceived.on(message => {
       if (message.purpose === 'navigate') {
         this.handleNavigation(message as NavigateMessage);
@@ -33,10 +30,6 @@ export default class Router {
         this.backCallback();
       }
     });
-  }
-
-  setHistory(history: any) {
-    this.history = history;
   }
 
   registerApplication(id: string, baseRoute: string) {
@@ -84,19 +77,11 @@ export default class Router {
 
   private handleNavigation(message: NavigateMessage) {
     this.backCallback = undefined;
-    this.triggeredRouting = true;
 
     this.context = message.context || {};
     this.extraData = message.params || {};
 
-    const location = {
-      pathname: message.route,
-      search: stringify(message.params || {}),
-    };
-    if (!this.history) {
-      throw `Tried to navigate to ${location} but was unable to do so as history is not setup. Make sure you called router.setHistory(history)`;
-    }
     const method = message.action === 'replace' ? this.history.replace : this.history.push;
-    method(location);
+    method(message.route);
   }
 }
