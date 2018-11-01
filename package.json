@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/liquid-state/iwa-router#readme",
   "devDependencies": {
-    "@liquid-state/iwa-core": "^1",
+    "@liquid-state/iwa-core": ">=1.7.0, <2",
     "@types/jest": "^22.1.2",
     "jest": "^22.3.0",
     "prettier": "^1.10.2",
@@ -33,7 +33,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "@liquid-state/iwa-core": "^1"
+    "@liquid-state/iwa-core": ">=1.7.0, <2"
   },
   "jest": {
     "moduleFileExtensions": [

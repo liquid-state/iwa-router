@@ -1,5 +1,5 @@
 import { ICommunicator } from '@liquid-state/iwa-core/dist/communicator';
-import { navigate, back, setBackOverride } from './messages';
+import { Messages } from '@liquid-state/iwa-core'; 
 import { IHistory } from './history';
 
 interface NavigateMessage {
@@ -59,40 +59,41 @@ export default class Router {
   resolve(path: string, applicationId: string) {
     path = this.normalise(path);
     const basePath = this.registeredApps.get(applicationId);
-    return basePath !== undefined ? `${basePath}${path}` : path;
+    return basePath !== undefined ? this.normalise(`${basePath}${path}`) : path;
   }
 
   navigate(path: string, options?: NavigateOptions) {
     path = this.normalise(path);
-    this.communicator.send(navigate(path, options));
+    this.communicator.send(Messages.iwa.navigate(path, options));
   }
 
   private normalise(path: string) {
     if (!path.startsWith('/')) {
       path = `/${path}`;
     }
-    while (path.endsWith('/')) {
-      path = path.slice(0, path.length - 2);
-    }
     while (path.includes('//')) {
       path = path.replace(/\/\//g, '/');
     }
+    if (path.length > 1 && path.endsWith('/')) {
+      path = path.slice(0, path.length - 2);
+    } 
     return path;
   }
 
   back(options?: BackOptions) {
-    const message = options ? back(options.route, options.iwa) : back();
+    const { navigateBack } = Messages.iwa;
+    const message = options ? navigateBack(options.route, options.iwa) : navigateBack();
     this.communicator.send(message);
   }
 
   setBackOverride(callback: () => void) {
     this.backCallback = callback;
-    this.communicator.send(setBackOverride(true));
+    this.communicator.send(Messages.app.setBackOverride(true));
   }
 
   clearBackOverride(): void {
     this.backCallback = undefined;
-    this.communicator.send(setBackOverride(false));
+    this.communicator.send(Messages.app.setBackOverride(false));
   }
 
   private handleNavigation(message: NavigateMessage) {
