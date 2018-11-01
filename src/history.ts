@@ -29,7 +29,7 @@ export default ({ baseHistory, router }: { baseHistory: IHistory, router: Router
   }
 
   const replace = (path: string) => {
-    router.navigate(path, true);
+    router.navigate(path, { replace: true });
   }
 
   const go = (n: number) => {
