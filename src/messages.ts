@@ -26,14 +26,14 @@ export type NavigateOptions = {
 
 export const navigate = (
   route: string,
-  options: NavigateOptions,
+  options: NavigateOptions = {},
 ) => {
   const data = {
     route: route,
     transition: options.replace ? 'replace' : 'push',
     webapp_id: options.app,
     tab_id: options.tab,
-    ...options.additionalData,
+    ...(options.additionalData || {}),
   };
 
   return {
