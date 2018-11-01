@@ -11,11 +11,11 @@ interface NavigateMessage {
 }
 
 export type NavigateOptions = {
-  app?: string,
-  tab?: string,
-  replace?: boolean,
-  additionalData?: object,
-}
+  app?: string;
+  tab?: string;
+  replace?: boolean;
+  additionalData?: object;
+};
 
 export interface BackOptions {
   route: string;
@@ -39,23 +39,23 @@ export default class Router {
     });
   }
 
-  /** Registers an application so that its routes can be remapped using resolve 
-   * 
+  /** Registers an application so that its routes can be remapped using resolve
+   *
    * @see Router#resolve
-  */
+   */
   registerApplication(applicationId: string, baseRoute: string) {
     this.registeredApps.set(applicationId, baseRoute);
   }
 
-  /** Resolves an IWA local path into an application global path 
-   * 
+  /** Resolves an IWA local path into an application global path
+   *
    * When building desktop applications which utilise multiple independent web apps
    * it becomes necessary to deal with route collisions.
    * eg. Webapp A and Webapp B both use / as their entrypoint routes.
    * This method takes a path and an IWA id and returns a mapped route based on the
    * applications registered with this router using the registerApplication method.
-   * 
-  */
+   *
+   */
   resolve(path: string, applicationId: string) {
     path = this.normalise(path);
     const basePath = this.registeredApps.get(applicationId);
