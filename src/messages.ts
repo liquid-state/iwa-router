@@ -17,17 +17,23 @@ const IAB = 'iab';
 
 const SET_BACK_OVERRIDE = 'set_back_override';
 
+export type NavigateOptions = {
+  app?: string,
+  tab?: string,
+  replace?: boolean,
+  additionalData?: object,
+}
+
 export const navigate = (
   route: string,
-  app: string | undefined,
-  replace = false,
-  additionalData?: object
+  options: NavigateOptions,
 ) => {
-  let data = {
+  const data = {
     route: route,
-    transition: replace ? 'replace' : 'push',
-    webapp_id: app,
-    ...additionalData,
+    transition: options.replace ? 'replace' : 'push',
+    webapp_id: options.app,
+    tab_id: options.tab,
+    ...options.additionalData,
   };
 
   return {

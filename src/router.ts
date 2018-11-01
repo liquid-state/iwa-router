@@ -36,7 +36,7 @@ export default class Router {
     this.registeredApps.set(id, baseRoute);
   }
 
-  navigate(path: string, replace?: boolean, additionalData?: object) {
+  navigate(path: string, replace?: boolean, tab?: string, additionalData?: object) {
     let iwa: string | undefined = undefined;
     if (path.indexOf('external://') !== -1) {
       // Strip the scheme.
@@ -46,7 +46,7 @@ export default class Router {
       iwa = path.substr(0, pathIndex);
       path = path.substr(pathIndex);
     }
-    this.communicator.send(navigate(path, iwa, replace, additionalData));
+    this.communicator.send(navigate(path, { app: iwa, tab, replace, additionalData }));
   }
 
   back(options?: BackOptions) {
