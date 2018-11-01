@@ -1,5 +1,5 @@
 import { ICommunicator } from '@liquid-state/iwa-core/dist/communicator';
-import { Messages } from '@liquid-state/iwa-core'; 
+import { Messages } from '@liquid-state/iwa-core';
 import { IHistory } from './history';
 
 interface NavigateMessage {
@@ -8,6 +8,7 @@ interface NavigateMessage {
   route: string;
   params: object;
   context: object;
+  [key: string]: any;
 }
 
 export type NavigateOptions = {
@@ -76,7 +77,7 @@ export default class Router {
     }
     if (path.length > 1 && path.endsWith('/')) {
       path = path.slice(0, path.length - 2);
-    } 
+    }
     return path;
   }
 
@@ -101,6 +102,25 @@ export default class Router {
 
     this.context = message.context || {};
     this.extraData = message.params || {};
+
+    if (message.__internal && message.__internal.isFromBack) {
+      /* This message was created by the desktop app during a navigateBack event
+        * Per the spec, when a navigateBack is recieved:
+        *   the stack should be restored to the last instance of that route
+        *   the original navigate message should be redelivered
+        * 
+        * this allows context and extraData to be set correctly, and the app to respond to the
+        * route being rendered regardless of whether it results from a navigate or navigateBack.
+        * 
+        * Because of limitations of the desktop browser, we cannot perfectly replicate this
+        * behaviour and so instead we implement the following:
+        *   The navigation middleware winds the stack back correctly
+        *   The navigation middleware dispatches the original navigation action for the new route
+        *   but with this additional flag added so that the router does not attempt to
+        *   manipulate the navigation stack.
+      */
+      return;
+    }
 
     const method = message.action === 'replace' ? this.history.replace : this.history.push;
     method(message.route);
