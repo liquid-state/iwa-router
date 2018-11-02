@@ -76,7 +76,7 @@ export default class Router {
       path = path.replace(/\/\//g, '/');
     }
     if (path.length > 1 && path.endsWith('/')) {
-      path = path.slice(0, path.length - 2);
+      path = path.slice(0, path.length - 1);
     }
     return path;
   }
