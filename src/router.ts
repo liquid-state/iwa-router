@@ -1,5 +1,5 @@
 import { ICommunicator } from '@liquid-state/iwa-core/dist/communicator';
-import { navigate, back, setBackOverride } from './messages';
+import { Messages } from '@liquid-state/iwa-core';
 import { IHistory } from './history';
 
 interface NavigateMessage {
@@ -8,7 +8,15 @@ interface NavigateMessage {
   route: string;
   params: object;
   context: object;
+  [key: string]: any;
 }
+
+export type NavigateOptions = {
+  app?: string;
+  tab?: string;
+  replace?: boolean;
+  additionalData?: object;
+};
 
 export interface BackOptions {
   route: string;
@@ -32,47 +40,61 @@ export default class Router {
     });
   }
 
-  registerApplication(id: string, baseRoute: string) {
-    this.registeredApps.set(id, baseRoute);
+  /** Registers an application so that its routes can be remapped using resolve
+   *
+   * @see Router#resolve
+   */
+  registerApplication(applicationId: string, baseRoute: string) {
+    this.registeredApps.set(applicationId, baseRoute);
   }
 
-  navigate(path: string, replace?: boolean, tab?: string, additionalData?: object) {
-    let iwa: string | undefined = undefined;
-    if (path.indexOf('external://') !== -1) {
-      // Strip the scheme.
-      path = path.substr(path.indexOf('//') + 2);
-      let pathIndex = path.indexOf('/');
+  /** Resolves an IWA local path into an application global path
+   *
+   * When building desktop applications which utilise multiple independent web apps
+   * it becomes necessary to deal with route collisions.
+   * eg. Webapp A and Webapp B both use / as their entrypoint routes.
+   * This method takes a path and an IWA id and returns a mapped route based on the
+   * applications registered with this router using the registerApplication method.
+   *
+   */
+  resolve(path: string, applicationId: string) {
+    path = this.normalise(path);
+    const basePath = this.registeredApps.get(applicationId);
+    return basePath !== undefined ? this.normalise(`${basePath}${path}`) : path;
+  }
 
-      iwa = path.substr(0, pathIndex);
-      path = path.substr(pathIndex);
+  navigate(path: string, options?: NavigateOptions) {
+    path = this.normalise(path);
+    this.communicator.send(Messages.iwa.navigate(path, options));
+  }
+
+  private normalise(path: string) {
+    if (!path.startsWith('/')) {
+      path = `/${path}`;
     }
-    this.communicator.send(navigate(path, { app: iwa, tab, replace, additionalData }));
+    while (path.includes('//')) {
+      path = path.replace(/\/\//g, '/');
+    }
+    if (path.length > 1 && path.endsWith('/')) {
+      path = path.slice(0, path.length - 1);
+    }
+    return path;
   }
 
   back(options?: BackOptions) {
-    const message = options ? back(options.route, options.iwa) : back();
+    const { navigateBack } = Messages.iwa;
+    const message = options ? navigateBack(options.route, options.iwa) : navigateBack();
     this.communicator.send(message);
   }
 
   setBackOverride(callback: () => void) {
     this.backCallback = callback;
-    this.communicator.send(setBackOverride(true));
+    this.communicator.send(Messages.app.setBackOverride(true));
   }
 
   clearBackOverride(): void {
     this.backCallback = undefined;
-    this.communicator.send(setBackOverride(false));
-  }
-
-  resolve(path: string, iwa?: string) {
-    if (!path.startsWith('/')) {
-      path = `/${path}`;
-    }
-    if (iwa) {
-      let basePath = this.registeredApps.get(iwa);
-      return basePath !== undefined ? `${basePath}${path}` : `/external://${iwa}${path}`;
-    }
-    return path;
+    this.communicator.send(Messages.app.setBackOverride(false));
   }
 
   private handleNavigation(message: NavigateMessage) {
@@ -80,6 +102,25 @@ export default class Router {
 
     this.context = message.context || {};
     this.extraData = message.params || {};
+
+    if (message.__internal && message.__internal.isFromBack) {
+      /* This message was created by the desktop app during a navigateBack event
+        * Per the spec, when a navigateBack is recieved:
+        *   the stack should be restored to the last instance of that route
+        *   the original navigate message should be redelivered
+        * 
+        * this allows context and extraData to be set correctly, and the app to respond to the
+        * route being rendered regardless of whether it results from a navigate or navigateBack.
+        * 
+        * Because of limitations of the desktop browser, we cannot perfectly replicate this
+        * behaviour and so instead we implement the following:
+        *   The navigation middleware winds the stack back correctly
+        *   The navigation middleware dispatches the original navigation action for the new route
+        *   but with this additional flag added so that the router does not attempt to
+        *   manipulate the navigation stack.
+      */
+      return;
+    }
 
     const method = message.action === 'replace' ? this.history.replace : this.history.push;
     method(message.route);

@@ -8,47 +8,54 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rollup -c",
+    "build": "tsc",
     "format": "prettier --parser typescript --single-quote --trailing-comma es5 --print-width 99 --write \"./src/**/*.ts\"",
     "test": "jest",
-    "prepack": "rollup -c"
+    "prepack": "tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/liquid-state/iwa-core.git"
+    "url": "git+https://github.com/liquid-state/iwa-router.git"
   },
   "author": "Liquid State",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/liquid-state/iwa-core/issues"
+    "url": "https://github.com/liquid-state/iwa-router/issues"
   },
-  "homepage": "https://github.com/liquid-state/iwa-core#readme",
+  "homepage": "https://github.com/liquid-state/iwa-router#readme",
   "devDependencies": {
-    "@liquid-state/iwa-core": "^1",
+    "@liquid-state/iwa-core": ">=1.7.0, <2",
     "@types/jest": "^22.1.2",
     "jest": "^22.3.0",
     "prettier": "^1.10.2",
-    "rollup": "^0.56.0",
-    "rollup-plugin-typescript2": "^0.11.1",
     "ts-jest": "^22.0.4",
     "typescript": "^2.7.2"
   },
   "dependencies": {},
   "peerDependencies": {
-    "@liquid-state/iwa-core": "^1"
+    "@liquid-state/iwa-core": ">=1.7.0, <2"
   },
   "jest": {
+    "testEnvironment": "node",
     "moduleFileExtensions": [
       "ts",
       "tsx",
       "js"
     ],
     "transform": {
-      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      "^.+\\.(t|j)sx?$": "ts-jest"
     },
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/(?!@liquid-state)"
+    ],
     "testRegex": "(/__tests__/.*|.*.test)\\.(ts|tsx|js)$",
     "roots": [
       "<rootDir>/src"
-    ]
+    ],
+    "globals": {
+      "ts-jest": {
+        "tsConfigFile": "tsconfig.test.json"
+      }
+    }
   }
 }
