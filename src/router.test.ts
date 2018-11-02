@@ -27,5 +27,10 @@ describe('Router', () => {
       expect(router.resolve('/test/', 'home')).toBe('/test');
       expect(router.resolve('//test//another////', 'home')).toBe('/test/another');
     });
+
+    it('Resolves correctly without an applicationId', () => {
+      const router = new Router(comm as any, null as any);
+      expect(router.resolve('test')).toBe('/test');
+    });
   });
 });

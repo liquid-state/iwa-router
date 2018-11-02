@@ -25,7 +25,7 @@ export interface BackOptions {
 
 export default class Router {
   private backCallback: (() => void) | undefined = undefined;
-  private registeredApps = new Map<string, string>();
+  private registeredApps = new Map<string | undefined, string>();
 
   public context: object;
   public extraData: object;
@@ -57,7 +57,7 @@ export default class Router {
    * applications registered with this router using the registerApplication method.
    *
    */
-  resolve(path: string, applicationId: string) {
+  resolve(path: string, applicationId?: string) {
     path = this.normalise(path);
     const basePath = this.registeredApps.get(applicationId);
     return basePath !== undefined ? this.normalise(`${basePath}${path}`) : path;
