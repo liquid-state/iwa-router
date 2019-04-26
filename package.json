@@ -1,6 +1,6 @@
 {
   "name": "@liquid-state/iwa-router",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0",
   "description": "Routing support for IWAs",
   "files": [
     "dist/"
